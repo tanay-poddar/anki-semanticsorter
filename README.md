@@ -4,7 +4,7 @@ Anki Page: [https://ankiweb.net/shared/info/1431425713](https://ankiweb.net/shar
 
 ## Overview
 
-This add-on is an Anki extension designed to reorder new, unsuspended flashcards within a specific deck based on their semantic similarity. By grouping conceptually related cards together, it aims to create a more cohesive learning experience. It was built around the AnKing Medical Deck in terms of specific optimization. Use case is designed for ~1000 cards in <5 seconds. Scaling up to ~9000 cards takes <5 minutes. 
+This add-on is an Anki extension designed to reorder new, unsuspended flashcards within a specific deck based on their semantic similarity. By grouping conceptually related cards together, it aims to create a more cohesive learning experience. It was built around the AnKing Medical Deck in terms of specific optimization. Use case is designed for ~1000 cards in <5 seconds (accurate mode). Scaling up to ~9000 cards takes <5 seconds (fast mode). 
 
 ## Key Features
 
@@ -30,7 +30,7 @@ Under **Tools > Add Ons > Get Add-ons**, copy and paste the following code into 
 
 1. Navigate to **Tools > Sort New Cards Semantically**.
 2. **Select a Deck**: A dialog box will appear listing all your available Anki decks. Select the deck containing the new cards you wish to sort and click **Ok**.
-3. **Choose Sorting Rigor (If Prompted)**: The add-on extracts the text from the "Text" and "Extra" fields of your new cards and calculates the estimated processing time. If the calculation is estimated to take longer than 10 seconds, you will be prompted to choose a sorting mode:
+3. **Choose Sorting Rigor (If Prompted)**: The add-on extracts the text from the "Text" and "Extra" fields of your new cards and calculates the estimated processing time. If the calculation is estimated to take longer than 10 seconds (right now the calculation is very conservative, it will become more accurate as you use it), you will be prompted to choose a sorting mode:
    - **Precision Mode**: More accurate, utilizing optimal leaf ordering to calculate the best possible hierarchical arrangement, but takes longer.
    - **Fast Mode**: Less accurate but significantly faster for very large decks.
    - **Cancel operations**: Aborts the process and leaves the deck unaltered.
