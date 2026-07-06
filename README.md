@@ -1,5 +1,7 @@
 # Semantic Card Sorter (Anki Add-on)
 
+Anki Page: [https://ankiweb.net/shared/info/1431425713](https://ankiweb.net/shared/info/1431425713)
+
 ## Overview
 
 This add-on is an Anki extension designed to reorder new, unsuspended flashcards within a specific deck based on their semantic similarity. By grouping conceptually related cards together, it aims to create a more cohesive learning experience. It was built around the AnKing Medical Deck in terms of specific optimization. Use case is designed for ~1000 cards in <5 seconds. Scaling up to ~9000 cards takes <5 minutes. 
@@ -14,6 +16,8 @@ This add-on is an Anki extension designed to reorder new, unsuspended flashcards
 - **Automated Dependency Management**: The add-on automatically detects if required external Python libraries are missing and offers to install them for you directly within Anki.
 
 ## How to Use the Add-on
+### 0. Installation
+Under **Tools > Add Ons > Get Add-ons**, copy and paste the following code into Anki 2.1: 1431425713
 
 ### 1. Initial Setup
 
