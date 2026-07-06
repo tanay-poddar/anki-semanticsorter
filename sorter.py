@@ -159,6 +159,7 @@ def profile_deck_complexity(all_texts):
 
 def execute_sorting_background(all_texts, all_cids, mode_choice):
     from scipy.cluster.hierarchy import linkage, optimal_leaf_ordering, leaves_list
+    from scipy.spatial.distance import squareform
     from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
     from sklearn.metrics.pairwise import pairwise_distances
     import numpy as np
@@ -181,12 +182,13 @@ def execute_sorting_background(all_texts, all_cids, mode_choice):
         return {"success": False, "error": f"TF-IDF vectorization failed: {e}"}
 
     try:
-        dist_matrix = pairwise_distances(X_reduced, metric='cosine')
-        link = linkage(dist_matrix, method="ward")
+        dist_matrix = pairwise_distances(X_reduced, metric='euclidean')
+        dist_condensed = squareform(dist_matrix, checks=False)
+        link = linkage(dist_condensed, method="ward")
         
         if mode_choice == 0:
             use_fallback = "TF-IDF (Precision Mode)"
-            ordered_link = optimal_leaf_ordering(link, dist_matrix)
+            ordered_link = optimal_leaf_ordering(link, dist_condensed)
             order = leaves_list(ordered_link)
         else:
             use_fallback = "TF-IDF (Fast Mode)"
