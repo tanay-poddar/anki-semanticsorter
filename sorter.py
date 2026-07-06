@@ -3,6 +3,7 @@ from .constants import CLOZE_RE, HTML_RE, DELIMITER_RE, PUNCT_RE, SPACES_RE, MED
 import time
 import os
 import json
+import gc
 from datetime import datetime
 
 BENCHMARK_DIR = os.path.join(os.path.dirname(__file__), "benchmarks")
@@ -158,7 +159,8 @@ def profile_deck_complexity(all_texts):
     return est_fast, est_precision
 
 def execute_sorting_background(all_texts, all_cids, mode_choice):
-    from scipy.cluster.hierarchy import linkage, optimal_leaf_ordering, leaves_list
+    import fastcluster as fc
+    from scipy.cluster.hierarchy import optimal_leaf_ordering, leaves_list
     from scipy.spatial.distance import squareform
     from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
     from sklearn.metrics.pairwise import pairwise_distances
@@ -182,9 +184,13 @@ def execute_sorting_background(all_texts, all_cids, mode_choice):
         return {"success": False, "error": f"TF-IDF vectorization failed: {e}"}
 
     try:
-        dist_matrix = pairwise_distances(X_reduced, metric='euclidean')
+        dist_matrix = pairwise_distances(X_reduced, metric='euclidean', n_jobs=-1)
         dist_condensed = squareform(dist_matrix, checks=False)
-        link = linkage(dist_condensed, method="ward")
+
+        del X_reduced, dist_matrix  # Free memory
+        gc.collect()
+
+        link = fc.linkage(dist_condensed, method="ward")
         
         if mode_choice == 0:
             use_fallback = "TF-IDF (Precision Mode)"
