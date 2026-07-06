@@ -19,7 +19,7 @@ This add-on is an Anki extension designed to reorder new, unsuspended flashcards
 
 1. Open Anki and navigate to the **Tools** menu.
 2. Click on the new menu item titled **"Sort New Cards Semantically"**.
-3. **Install Dependencies**: If this is your first time running the add-on, it will check for necessary Python packages (`numpy`, `scipy`, and `scikit-learn`). If they are missing, a prompt will ask for permission to install them. Click **Ok** to allow the background installation. 
+3. **Install Dependencies**: If this is your first time running the add-on, it will check for necessary Python packages (`numpy`, `scipy`, `scikit-learn`, and `fastcluster`). If they are missing, a prompt will ask for permission to install them. Click **Ok** to allow the background installation. 
 4. **Restart Anki**: If dependencies were installed, a notification will prompt you to restart Anki before proceeding.
 
 ### 2. Sorting a Deck
