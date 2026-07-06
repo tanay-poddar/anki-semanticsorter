@@ -2,7 +2,7 @@
 
 ## Overview
 
-This add-on is an Anki extension designed to reorder new, unsuspended flashcards within a specific deck based on their semantic similarity. By grouping conceptually related cards together, it aims to create a more cohesive learning experience. It was built around the AnKing Medical Deck in terms of specific optimization. 
+This add-on is an Anki extension designed to reorder new, unsuspended flashcards within a specific deck based on their semantic similarity. By grouping conceptually related cards together, it aims to create a more cohesive learning experience. It was built around the AnKing Medical Deck in terms of specific optimization. Use case is designed for ~1000 cards in <5 seconds. Scaling up to ~9000 cards takes <5 minutes. 
 
 ## Key Features
 
