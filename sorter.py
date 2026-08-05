@@ -1,5 +1,6 @@
 from aqt import mw
 from .constants import CLOZE_RE, HTML_RE, DELIMITER_RE, PUNCT_RE, SPACES_RE, MEDICAL_STOP_WORDS
+from .deps import add_site_packages_to_sys_path
 import time
 import os
 import json
@@ -19,7 +20,6 @@ def load_benchmarks():
             return json.load(f)
     except Exception:
         return []
-
 
 def save_benchmark(entry):
     if not os.path.exists(BENCHMARK_DIR):
@@ -108,7 +108,11 @@ def extract_and_clean_texts(deck_name, field_name):
     return (all_texts, all_cids), None
 
 def profile_deck_complexity(all_texts):
-    import numpy as np
+    try:
+        import numpy as np
+    except ImportError:
+        add_site_packages_to_sys_path()
+        import numpy as np
 
     n_cards = len(all_texts)
     if n_cards <= 0:
@@ -159,12 +163,21 @@ def profile_deck_complexity(all_texts):
     return est_fast, est_precision
 
 def execute_sorting_background(all_texts, all_cids, mode_choice):
-    import fastcluster as fc
-    from scipy.cluster.hierarchy import optimal_leaf_ordering, leaves_list
-    from scipy.spatial.distance import squareform
-    from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
-    from sklearn.metrics.pairwise import pairwise_distances
-    import numpy as np
+    try:
+        import fastcluster as fc
+        from scipy.cluster.hierarchy import optimal_leaf_ordering, leaves_list
+        from scipy.spatial.distance import squareform
+        from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
+        from sklearn.metrics.pairwise import pairwise_distances, pairwise_distances_chunked
+        import numpy as np
+    except ImportError:
+        add_site_packages_to_sys_path()
+        import fastcluster as fc
+        from scipy.cluster.hierarchy import optimal_leaf_ordering, leaves_list
+        from scipy.spatial.distance import squareform
+        from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
+        from sklearn.metrics.pairwise import pairwise_distances, pairwise_distances_chunked
+        import numpy as np
 
     start_time = time.time()
     custom_stop_words = ENGLISH_STOP_WORDS.union(MEDICAL_STOP_WORDS)
@@ -173,23 +186,45 @@ def execute_sorting_background(all_texts, all_cids, mode_choice):
         vec = TfidfVectorizer(
                 stop_words=list(custom_stop_words),
                 ngram_range=(1, 3),
-                token_pattern=r'(?u)\b\w+\b',
+                token_pattern=r'(?u)\b\w+\b',   
                 min_df=2,
                 max_df=0.90
             )
         X_reduced = vec.fit_transform(all_texts)
         amplify_factor = np.log1p(vec.idf_)
         X_reduced.data *= amplify_factor[X_reduced.indices]
+        X_reduced.data = X_reduced.data.astype(np.float32, copy=False)
     except Exception as e:
         return {"success": False, "error": f"TF-IDF vectorization failed: {e}"}
 
     try:
-        dist_matrix = pairwise_distances(X_reduced, metric='euclidean', n_jobs=-1)
-        dist_condensed = squareform(dist_matrix, checks=False)
+        n_samples = X_reduced.shape[0]
+        LARGE_DATA_THRESHOLD = 10000
+        
+        if n_samples > LARGE_DATA_THRESHOLD:
+            # Memory-efficient chunked distance calculation for large datasets
+            condensed_size = n_samples * (n_samples - 1) // 2
+            dist_condensed = np.empty(condensed_size, dtype=np.float32)
+            col_indices = np.arange(n_samples)
 
-        del X_reduced, dist_matrix  # Free memory
+            row_start = 0
+            current_idx = 0
+            for D_chunk in pairwise_distances_chunked(X_reduced, metric='euclidean', n_jobs=-1):
+                chunk_size = D_chunk.shape[0]
+                row_idx = np.arange(row_start, row_start + chunk_size)[:, None]
+                valid_dists = D_chunk[col_indices > row_idx]
+                end_idx = current_idx + valid_dists.shape[0]
+                dist_condensed[current_idx:end_idx] = valid_dists.astype(np.float32, copy=False)
+                current_idx = end_idx
+                row_start += chunk_size
+        else:
+            # For smaller datasets, compute the full distance matrix directly
+            dist_matrix = pairwise_distances(X_reduced, metric='euclidean', n_jobs=-1)
+            dist_condensed = squareform(dist_matrix, checks=False).astype(np.float32, copy=False)
+            del dist_matrix  # Free memory immediately after conversion
+            
+        del X_reduced, vec, amplify_factor
         gc.collect()
-
         link = fc.linkage(dist_condensed, method="ward")
         
         if mode_choice == 0:
