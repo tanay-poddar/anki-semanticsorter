@@ -1,6 +1,7 @@
 import sys
 import subprocess
 import os
+import glob
 from aqt import mw
 from aqt.utils import showInfo, showWarning, askUser
 from .constants import MENU_NAME
