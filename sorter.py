@@ -1,6 +1,6 @@
 from aqt import mw
 from .constants import CLOZE_RE, HTML_RE, DELIMITER_RE, PUNCT_RE, SPACES_RE, MEDICAL_STOP_WORDS
-from .deps import add_site_packages_to_sys_path
+from .deps import (add_site_packages_to_sys_path,check_and_install_deps)
 import time
 import os
 import json

@@ -3,7 +3,7 @@ from aqt import mw
 from aqt.qt import QDialog, QVBoxLayout, QLabel, QListWidget, QDialogButtonBox, Qt, qconnect
 from aqt.utils import showInfo, showWarning, showText, disable_help_button
 from aqt.operations.scheduling import reposition_new_cards
-from .deps import check_and_install_deps
+from .deps import (add_site_packages_to_sys_path,check_and_install_deps)
 from .sorter import extract_and_clean_texts, profile_deck_complexity, execute_sorting_background
 
 def chooseList(prompt: str, choices: list[str], startrow=0, parent=None):
